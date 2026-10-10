@@ -1,34 +1,46 @@
-# Dashboard de Instagram
+# Dashboard de Instagram · Plantilla para alumnas
 
-Tu panel de métricas de Instagram con la API oficial de Meta: seguidores, alcance, interacción, reels, historias, audiencia y el mejor horario para publicar. Funciona desde el navegador y se puede instalar como app en el celular.
+Proyecto educativo basado en el dashboard de Instagram de Vanessa Scott / Emprendedoras Magnéticas. Conserva el diseño y funcionalidades de la rama original, con conexión individual mediante token.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/TU_USUARIO/dashboard-instagram&project-name=dashboard-instagram)
+## Instalación sin programar
 
-## Para tenerlo
+1. Descarga el ZIP de esta rama y **descomprímelo**.
+2. Abre GitHub, crea un repositorio nuevo y sube los **archivos de dentro** de la carpeta (no el ZIP). Es importante incluir `api/`, `css/` y `js/`.
+3. En Vercel, elige **Add New > Project > Import Git Repository**, selecciona tu repositorio y despliega usando la configuración predeterminada (sin framework, directorio raíz).
+4. Abre el enlace HTTPS que te da Vercel.
+5. Sigue el asistente del dashboard para generar tu token personal en Meta for Developers y conectar una cuenta profesional de Instagram.
+6. Vuelve a cargar si el navegador muestra archivos antiguos. Los datos de audiencia y algunas métricas dependen de los permisos y la disponibilidad de la API.
 
-1. Crea una cuenta gratis en GitHub (github.com).
-2. Haz clic en el botón **Deploy** de arriba, entra a Vercel con tu cuenta de GitHub y toca **Create**.
-3. Saca tu token de Instagram en Meta for Developers.
-4. Abre tu dashboard y pega el token.
-
-La guía paso a paso está en la comunidad de Emprendedoras Magnéticas.
+**No pegues tu token en GitHub, ni en capturas, mensajes o variables públicas de Vercel.** El token se introduce exclusivamente en el asistente del dashboard. No configures `INSTAGRAM_TOKEN` ni `INSTAGRAM_USER_ID` en Vercel.
 
 ## Requisitos
 
-- Cuenta de Instagram profesional (empresa o creador), vinculada a Facebook.
-- El token dura 60 días. El dashboard avisa cuando está por vencer.
-- Los datos de audiencia aparecen desde los 100 seguidores.
-- El historial se guarda en el navegador donde abres el dashboard.
+- GitHub y Vercel; cuentas propias.
+- Instagram profesional y permisos de API autorizados por Meta.
+- Token personal vigente y conexión HTTPS.
+- La API puede limitar métricas, periodos y datos de audiencia.
 
-## Opcional
+## Opcionales y límites
 
-- **Análisis con IA:** agrega en Vercel la variable `ANTHROPIC_API_KEY` con una clave de console.anthropic.com. Usa créditos de tu cuenta de Anthropic.
-- **Historial en la nube (Supabase):** no lo recomendamos para empezar. Si lo activas, el token de Instagram queda guardado en tu base de datos.
+- Análisis con IA: solo si la alumna configura su propia clave `ANTHROPIC_API_KEY` **en el servidor de Vercel**; puede generar cargos por uso.
+- Esta plantilla **no activa Supabase**: guarda token e historial en el navegador local. Usa un navegador/dispositivo propio; evita computadoras compartidas. Si borras datos del sitio, se borra la conexión local.
+- El token se envía por HTTPS a la función del propio despliegue y de allí a la API de Meta. No se coloca en los parámetros URL del navegador.
+- La configuración de permisos y pantallas de Meta puede cambiar, por lo que los pasos de generación del token deben confirmarse en la documentación oficial.
+- No se ha realizado una prueba de integración en una cuenta nueva de Meta desde esta plantilla.
 
-## Skills incluidas
+## Métricas de engagement
 
-En la carpeta `skills/` hay dos skills para Claude: `reporte-mensual-instagram` y `plan-de-accion-instagram`. Exporta el HTML desde el dashboard y pídele a Claude el reporte del mes y después el plan de acción.
+- **Perfil (por alcance):** interacciones totales / cuentas alcanzadas × 100.
+- **Publicaciones:** promedio de la tasa de cada publicación con alcance disponible; posts sin alcance no entran en ese promedio.
+- No compares estas tasas como si midieran exactamente lo mismo.
+
+## Si ves el dashboard en blanco
+
+- Comprueba que subiste las carpetas `api`, `css`, `js` y los HTML.
+- Revisa el despliegue en Vercel y abre su URL HTTPS, no `file://`.
+- Si el token caducó, genera otro y vuelve a conectar.
+- Haz una actualización completa de la página. Si la app instalable guarda una versión antigua, elimina su caché.
 
 ## Créditos
 
-Adaptación al español de Vanessa Scott para Emprendedoras Magnéticas, basada en el Instagram Dashboard del Clube Divos da IA. Licencia MIT.
+Adaptación de Vanessa Scott para Emprendedoras Magnéticas, basada en el Instagram Dashboard del Clube Divos da IA. Conserva la licencia del repositorio original.
