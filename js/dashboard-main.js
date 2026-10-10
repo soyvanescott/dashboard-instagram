@@ -33,10 +33,10 @@ function checkTokenExpiry() {
   if (remaining === null) return;
   if (remaining <= 0) {
     warning.className = 'token-warning visible';
-    warning.textContent = '⚠️ Tu token venció. Genera uno nuevo en Meta for Developers y vuelve a conectarte.';
+    warning.textContent = 'Atención: tu token venció. Genera uno nuevo en Meta for Developers y vuelve a conectarte.';
   } else if (remaining <= 7) {
     warning.className = 'token-warning visible';
-    warning.textContent = `⚠️ Tu token vence en ${remaining} día${remaining === 1 ? '' : 's'}. Renuévalo en Meta for Developers.`;
+    warning.textContent = `Atención: tu token vence en ${remaining} día${remaining === 1 ? '' : 's'}. Renuévalo en Meta for Developers.`;
   }
 }
 
@@ -68,6 +68,7 @@ function setupDatePickerDefaults() {
 
 async function exportHTML() {
   const btn = document.getElementById('btnExport');
+  const originalBtnHtml = btn?.innerHTML;
   if (btn) { btn.textContent = 'Generando...'; btn.disabled = true; }
 
   try {
@@ -138,7 +139,7 @@ async function exportHTML() {
   } catch (err) {
     alert('Error al exportar: ' + err.message);
   } finally {
-    if (btn) { btn.textContent = '⬇ HTML'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = originalBtnHtml || 'HTML'; btn.disabled = false; }
   }
 }
 
@@ -302,6 +303,7 @@ async function loadDashboard(forceRefresh = false, days = currentDays) {
     const btnAi = document.getElementById('btnAiAnalysis');
     if (btnAi) {
       btnAi.addEventListener('click', async () => {
+        const originalBtnHtml = btnAi.innerHTML;
         btnAi.textContent = 'Analizando...';
         btnAi.disabled = true;
         try {
@@ -346,7 +348,7 @@ async function loadDashboard(forceRefresh = false, days = currentDays) {
         } catch (err) {
           alert((/ANTHROPIC_API_KEY/.test(err.message) ? 'El análisis con IA es opcional y no está activado en tu dashboard. Para activarlo, sigue la sección "Análisis con IA" de la guía.' : 'Error en el análisis con IA: ' + err.message));
         } finally {
-          btnAi.textContent = '\ud83e\udd16 IA';
+          btnAi.innerHTML = originalBtnHtml;
           btnAi.disabled = false;
         }
       });

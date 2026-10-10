@@ -4,6 +4,39 @@
 
 let _chartInstances = {};
 
+const ICON_PATHS = {
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  'trending-up': '<path d="m3 17 6-6 4 4 8-8"/><path d="M14 7h7v7"/>',
+  'trending-down': '<path d="m3 7 6 6 4-4 8 8"/><path d="M21 10v7h-7"/>',
+  eye: '<path d="M2.06 12.35a1 1 0 0 1 0-.7C3.73 7.71 7.4 5 12 5s8.27 2.71 9.94 6.65a1 1 0 0 1 0 .7C20.27 16.29 16.6 19 12 19S3.73 16.29 2.06 12.35Z"/><circle cx="12" cy="12" r="3"/>',
+  sparkles: '<path d="m12 3-1.6 4.4L6 9l4.4 1.6L12 15l1.6-4.4L18 9l-4.4-1.6L12 3Z"/><path d="m5 16-.8 2.2L2 19l2.2.8L5 22l.8-2.2L8 19l-2.2-.8L5 16Z"/><path d="m19 14-.8 2.2L16 17l2.2.8L19 20l.8-2.2L22 17l-2.2-.8L19 14Z"/>',
+  heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/>',
+  message: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path d="M8 9h8M8 13h5"/>',
+  bookmark: '<path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/>',
+  share: '<path d="m17 1 4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="m7 23-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+  zap: '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/>',
+  chart: '<path d="M3 3v18h18"/><path d="M7 16v-5M12 16V7M17 16v-3"/>',
+  reel: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="m7 3 4 4M13 3l4 4M3 11h18"/><path d="m10 14 4 2-4 2Z"/>',
+  carousel: '<rect width="14" height="14" x="3" y="7" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2"/>',
+  image: '<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+  flame: '<path d="M12 22c4.4 0 8-3.6 8-8 0-3-1.5-5.5-4-7 .2 2-1 3.5-2.5 4.3.2-3.5-1.8-7-5-9.3.2 3-1.8 5.2-3.4 7.2A7.8 7.8 0 0 0 4 14c0 4.4 3.6 8 8 8Z"/><path d="M9 18c0-2 1.5-3 3-4 0 2 1 3 2 4"/>',
+  smartphone: '<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
+  trophy: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H3v2a4 4 0 0 0 4 4M17 6h4v2a4 4 0 0 1-4 4"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h6"/>',
+  refresh: '<path d="M20 6v5h-5"/><path d="M4 18v-5h5"/><path d="M18.5 9A7 7 0 0 0 6.2 6.2L4 11M20 13l-2.2 4.8A7 7 0 0 1 5.5 15"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  alert: '<path d="M10.3 2.9 1.8 17a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 2.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>',
+  stop: '<circle cx="12" cy="12" r="10"/><path d="M8 8l8 8M16 8l-8 8"/>'
+};
+
+function iconSvg(name) {
+  const paths = ICON_PATHS[name];
+  if (!paths) return '';
+  return `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = String(str ?? '');
@@ -62,7 +95,7 @@ function metricCard({ icon, value, label, cssClass = '', suffix = '', isFloat = 
     : '';
 
   return `<div class="metric-card">
-    ${icon ? `<div class="metric-icon">${escapeHtml(icon)}</div>` : ''}
+    ${icon ? `<div class="metric-icon">${iconSvg(icon)}</div>` : ''}
     <span class="metric-value${classAttr}" ${dataAttr}>${displayVal}${escapeHtml(suffix)}</span>
     <span class="metric-label">${escapeHtml(label)}</span>
     ${trend !== null ? trendHtml(trend) : ''}
@@ -165,11 +198,11 @@ export function renderHeader(data, days = 30, periodo = null, accounts = [], act
           <input type="date" id="dateTo" class="date-input">
           <button class="btn btn-primary btn-sm" id="btnApplyRange">Aplicar</button>
         </div>
-        <button class="btn btn-ghost" id="btnExport">⬇ HTML</button>
-        <button class="btn btn-ghost" id="btnAiAnalysis">🤖 IA</button>
-        <button class="btn btn-ghost" id="btnExportPdf">📄 PDF</button>
-        <button class="btn btn-primary" id="btnRefresh">↻ Actualizar</button>
-        <button class="btn btn-danger" id="btnDisconnect">Salir</button>
+        <button class="btn btn-ghost" id="btnExport">${iconSvg('download')}<span>HTML</span></button>
+        <button class="btn btn-ghost" id="btnAiAnalysis">${iconSvg('sparkles')}<span>Analizar</span></button>
+        <button class="btn btn-ghost" id="btnExportPdf">${iconSvg('file')}<span>PDF</span></button>
+        <button class="btn btn-primary" id="btnRefresh">${iconSvg('refresh')}<span>Actualizar</span></button>
+        <button class="btn btn-danger btn-icon-only" id="btnDisconnect" aria-label="Salir" title="Salir">${iconSvg('logout')}</button>
       </div>
     </div>
     <div class="header-kpis">${kpisHtml}</div>`;
@@ -179,15 +212,17 @@ export function renderHeader(data, days = 30, periodo = null, accounts = [], act
 //  CHARTS
 // ============================================================
 
-function destroyCharts() {
-  Object.values(_chartInstances).forEach(c => { try { c.destroy(); } catch (_) {} });
-  _chartInstances = {};
+function destroyPrimaryCharts() {
+  ['weekly', 'content'].forEach(key => {
+    try { _chartInstances[key]?.destroy(); } catch (_) {}
+    delete _chartInstances[key];
+  });
 }
 
 function initCharts(weeklyData, conteudo) {
   if (typeof Chart === 'undefined') return;
 
-  destroyCharts();
+  destroyPrimaryCharts();
 
   if (typeof ChartDataLabels !== 'undefined') {
     Chart.register(ChartDataLabels);
@@ -244,6 +279,7 @@ function initCharts(weeklyData, conteudo) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { duration: 900, easing: 'easeOutQuart' },
         plugins: {
           legend: { labels: { color: tickColor, boxWidth: 12, padding: 16 } },
           tooltip: tooltipDefaults,
@@ -283,6 +319,7 @@ function initCharts(weeklyData, conteudo) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { duration: 900, easing: 'easeOutQuart' },
         cutout: '62%',
         plugins: {
           legend: { position: 'bottom', labels: { color: tickColor, boxWidth: 12, padding: 14 } },
@@ -311,10 +348,10 @@ function typeLabel(m) {
   return 'Post';
 }
 
-function typeEmoji(m) {
-  if (m.media_product_type === 'REELS') return '🎬';
-  if (m.media_type === 'CAROUSEL_ALBUM') return '🖼';
-  return '📷';
+function typeIcon(m) {
+  if (m.media_product_type === 'REELS') return iconSvg('reel');
+  if (m.media_type === 'CAROUSEL_ALBUM') return iconSvg('carousel');
+  return iconSvg('image');
 }
 
 function renderTopPosts(topPosts) {
@@ -324,7 +361,7 @@ function renderTopPosts(topPosts) {
     const imgSrc = post.thumbnail_url || post.media_url || null;
     const thumb = imgSrc
       ? `<img src="${escapeHtml(imgSrc)}" alt="post" loading="lazy">`
-      : `<span style="font-size:36px">${typeEmoji(post)}</span>`;
+      : `<span class="post-placeholder-icon">${typeIcon(post)}</span>`;
 
     const link = post.permalink ? escapeHtml(post.permalink) : '#';
 
@@ -507,25 +544,25 @@ function renderAnalysis(data) {
 
   const healthCards = `<div class="cards-row">
     <div class="metric-card">
-      <div class="metric-icon">🔖</div>
+      <div class="metric-icon">${iconSvg('bookmark')}</div>
       <span class="metric-value" style="color:${saveColor}">${saveRate}%</span>
       <span class="metric-label">Tasa de guardados</span>
       <span class="metric-trend neutral" style="font-size:10px">referencia: más de 2%</span>
     </div>
     <div class="metric-card">
-      <div class="metric-icon">🔁</div>
+      <div class="metric-icon">${iconSvg('share')}</div>
       <span class="metric-value" style="color:${shareColor}">${shareRate}%</span>
       <span class="metric-label">Tasa de compartidos</span>
       <span class="metric-trend neutral" style="font-size:10px">referencia: más de 1%</span>
     </div>
     <div class="metric-card">
-      <div class="metric-icon">⚡</div>
+      <div class="metric-icon">${iconSvg('zap')}</div>
       <span class="metric-value" style="color:${engColor}">${taxaEng}%</span>
       <span class="metric-label">Tasa de interacción</span>
       <span class="metric-trend neutral" style="font-size:10px">referencia: más de 3%</span>
     </div>
     ${bestReach ? `<div class="metric-card">
-      <div class="metric-icon">🏆</div>
+      <div class="metric-icon">${iconSvg('trophy')}</div>
       <span class="metric-value" style="font-size:18px">${escapeHtml(bestReach.name)}</span>
       <span class="metric-label">Mejor formato (alcance)</span>
       <span class="metric-trend neutral" style="font-size:10px">${formatNumber(bestReach.avgViews)} por publicación</span>
@@ -536,17 +573,17 @@ function renderAnalysis(data) {
 
   const recCards = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px">
     <div class="metric-card" style="text-align:left;padding:28px 28px;align-self:start">
-      <div style="font-size:24px;margin-bottom:10px">✅</div>
+      <div class="recommendation-icon positive">${iconSvg('check')}</div>
       <div style="font-weight:600;color:var(--positive);margin-bottom:16px;font-size:12px;text-transform:uppercase;letter-spacing:.08em">Seguir haciendo</div>
       <ul style="padding-left:18px;margin:0;color:var(--text-secondary)">${makeList(continuar)}</ul>
     </div>
     <div class="metric-card" style="text-align:left;padding:28px 28px;align-self:start">
-      <div style="font-size:24px;margin-bottom:10px">⚠️</div>
+      <div class="recommendation-icon warning">${iconSvg('alert')}</div>
       <div style="font-weight:600;color:#f59e0b;margin-bottom:16px;font-size:12px;text-transform:uppercase;letter-spacing:.08em">Mejorar</div>
       <ul style="padding-left:18px;margin:0;color:var(--text-secondary)">${makeList(melhorar)}</ul>
     </div>
     <div class="metric-card" style="text-align:left;padding:28px 28px;align-self:start">
-      <div style="font-size:24px;margin-bottom:10px">🛑</div>
+      <div class="recommendation-icon danger">${iconSvg('stop')}</div>
       <div style="font-weight:600;color:var(--negative);margin-bottom:16px;font-size:12px;text-transform:uppercase;letter-spacing:.08em">Dejar de hacer</div>
       <ul style="padding-left:18px;margin:0;color:var(--text-secondary)">${makeList(parar)}</ul>
     </div>
@@ -595,7 +632,7 @@ function renderHeatmap(postingHeatmap) {
 
   const bestLabel = bestSlot ? dayLabels[bestSlot.day] + ' a las ' + bestSlot.hour + 'h (' + bestSlot.avgEng + ' interacción promedio)' : '';
 
-  return sectionWrap('Cuándo publicar', 'Mejor horario', '<div class="heatmap-wrap"><div class="heatmap-header"><div class="heatmap-day-label"></div>' + headerCells + '</div>' + rows + '</div>' + (bestLabel ? '<p class="heatmap-best">⭐ Mejor horario: <strong>' + bestLabel + '</strong></p>' : '') + '<p class="heatmap-legend"><span class="heatmap-legend-low"></span> Interacción baja <span class="heatmap-legend-high"></span> Interacción alta</p>');
+  return sectionWrap('Cuándo publicar', 'Mejor horario', '<div class="heatmap-wrap"><div class="heatmap-header"><div class="heatmap-day-label"></div>' + headerCells + '</div>' + rows + '</div>' + (bestLabel ? '<p class="heatmap-best">' + iconSvg('sparkles') + '<span>Mejor horario: <strong>' + bestLabel + '</strong></span></p>' : '') + '<p class="heatmap-legend"><span class="heatmap-legend-low"></span> Interacción baja <span class="heatmap-legend-high"></span> Interacción alta</p>');
 }
 
 // ============================================================
@@ -615,12 +652,12 @@ export function renderDashboard(data, deltas = null) {
 
   const unfollowsCard = crescimento?.unfollows === null
     ? `<div class="metric-card">
-        <div class="metric-icon">📉</div>
+        <div class="metric-icon">${iconSvg('trending-down')}</div>
         <span class="metric-value" style="font-size:16px;color:var(--text-muted)">N/D</span>
         <span class="metric-label">Dejaron de seguir</span>
         <span class="metric-trend neutral" style="font-size:10px">La API no lo muestra</span>
       </div>`
-    : metricCard({ icon: '📉', value: crescimento?.unfollows ?? 0, label: 'Dejaron de seguir', cssClass: 'negative' });
+    : metricCard({ icon: 'trending-down', value: crescimento?.unfollows ?? 0, label: 'Dejaron de seguir', cssClass: 'negative' });
 
   let periodoLabel = periodo
     ? `${periodo.desde} → ${periodo.ate}`
@@ -631,25 +668,61 @@ export function renderDashboard(data, deltas = null) {
     periodoLabel += ` — vs. coleta de ${day}/${m}`;
   }
 
+  const weeklyValues = (weeklyData ?? []).map(w => (w.curtidas ?? 0) + (w.saves ?? 0) + (w.shares ?? 0));
+  const sparkValues = weeklyValues.length > 1 ? weeklyValues : [24, 42, 35, 68, 57, 86];
+  const sparkMax = Math.max(...sparkValues, 1);
+  const sparkPoints = sparkValues.map((value, index) => {
+    const x = sparkValues.length === 1 ? 150 : index * (300 / (sparkValues.length - 1));
+    const y = 92 - (value / sparkMax) * 72;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+
+  const hero = `<section class="insight-hero">
+    <div class="insight-hero-copy">
+      <div class="hero-eyebrow">Instagram Intelligence · ${escapeHtml(periodoLabel)}</div>
+      <h1>Tus datos, convertidos en <em>decisiones.</em></h1>
+      <p>En este periodo alcanzaste <strong>${formatNumber(alcance?.contasAlcancadas ?? 0)} cuentas</strong> y generaste <strong>${formatNumber(engajamento?.interacoesTotal ?? 0)} interacciones</strong>. Aquí tienes la lectura completa para decidir qué repetir, ajustar y dejar atrás.</p>
+      <div class="hero-stats">
+        <div><strong>${formatNumber(crescimento?.novosSeguidores ?? 0)}</strong><span>Nuevos seguidores</span></div>
+        <div><strong>${formatNumber(alcance?.contasAlcancadas ?? 0)}</strong><span>Alcance</span></div>
+        <div><strong>${engajamento?.taxaEngajamento ?? 0}%</strong><span>Interacción</span></div>
+      </div>
+    </div>
+    <div class="hero-visual" aria-label="Tendencia de interacciones del periodo">
+      <div class="hero-chart-label"><span>${iconSvg('trending-up')}</span> Tendencia del periodo</div>
+      <svg viewBox="0 0 300 110" role="img" aria-hidden="true">
+        <defs>
+          <linearGradient id="heroFill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#FFB5B7" stop-opacity=".34"/>
+            <stop offset="100%" stop-color="#FFB5B7" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <polygon points="0,106 ${sparkPoints} 300,106" fill="url(#heroFill)"/>
+        <polyline points="${sparkPoints}" fill="none" stroke="#FFB5B7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="hero-chart-footer"><span>Contenido</span><span>Alcance</span><span>Conversación</span></div>
+    </div>
+  </section>`;
+
   // 1. Crescimento + Alcance + Engajamento
   const s1 = sectionWrap(periodoLabel, 'Crecimiento y alcance', `
     <div class="cards-row">
-      ${metricCard({ icon: '👥', value: crescimento?.seguidoresTotal ?? 0, label: 'Seguidores totales', trend: d.seguidores })}
-      ${metricCard({ icon: '📈', value: crescimento?.novosSeguidores ?? 0, label: 'Nuevos seguidores', cssClass: 'positive', trend: d.novosSeguidores })}
+      ${metricCard({ icon: 'users', value: crescimento?.seguidoresTotal ?? 0, label: 'Seguidores totales', trend: d.seguidores })}
+      ${metricCard({ icon: 'trending-up', value: crescimento?.novosSeguidores ?? 0, label: 'Nuevos seguidores', cssClass: 'positive', trend: d.novosSeguidores })}
       ${unfollowsCard}
-      ${metricCard({ icon: '👁', value: alcance?.contasAlcancadas ?? 0, label: 'Cuentas alcanzadas', trend: d.alcance })}
-      ${metricCard({ icon: '✨', value: alcance?.impressoes ?? 0, label: 'Impresiones', trend: d.impressoes })}
+      ${metricCard({ icon: 'eye', value: alcance?.contasAlcancadas ?? 0, label: 'Cuentas alcanzadas', trend: d.alcance })}
+      ${metricCard({ icon: 'sparkles', value: alcance?.impressoes ?? 0, label: 'Impresiones', trend: d.impressoes })}
     </div>`);
 
   // 2. Engajamento
   const s2 = sectionWrap('Interacciones', 'Interacción', `
     <div class="cards-row">
-      ${metricCard({ icon: '❤️', value: engajamento?.curtidas ?? 0, label: 'Me gusta', trend: d.curtidas })}
-      ${metricCard({ icon: '💬', value: engajamento?.comentarios ?? 0, label: 'Comentarios', trend: d.comentarios })}
-      ${metricCard({ icon: '🔖', value: engajamento?.salvamentos ?? 0, label: 'Guardados', trend: d.salvamentos })}
-      ${metricCard({ icon: '🔁', value: engajamento?.compartilhamentos ?? 0, label: 'Compartidos', trend: d.compartilhamentos })}
-      ${metricCard({ icon: '⚡', value: engajamento?.interacoesTotal ?? 0, label: 'Interacciones totales', trend: d.interacoesTotal })}
-      ${metricCard({ icon: '📊', value: engajamento?.taxaEngajamento ?? 0, label: 'Tasa de interacción', suffix: '%', isFloat: true, cssClass: 'accent', trend: d.taxaEngajamento })}
+      ${metricCard({ icon: 'heart', value: engajamento?.curtidas ?? 0, label: 'Me gusta', trend: d.curtidas })}
+      ${metricCard({ icon: 'message', value: engajamento?.comentarios ?? 0, label: 'Comentarios', trend: d.comentarios })}
+      ${metricCard({ icon: 'bookmark', value: engajamento?.salvamentos ?? 0, label: 'Guardados', trend: d.salvamentos })}
+      ${metricCard({ icon: 'share', value: engajamento?.compartilhamentos ?? 0, label: 'Compartidos', trend: d.compartilhamentos })}
+      ${metricCard({ icon: 'zap', value: engajamento?.interacoesTotal ?? 0, label: 'Interacciones totales', trend: d.interacoesTotal })}
+      ${metricCard({ icon: 'chart', value: engajamento?.taxaEngajamento ?? 0, label: 'Tasa de interacción', suffix: '%', isFloat: true, cssClass: 'accent', trend: d.taxaEngajamento })}
     </div>`);
 
   // 3. Charts
@@ -678,25 +751,25 @@ export function renderDashboard(data, deltas = null) {
   const cp = contentPerformance ?? {};
   const s4 = sectionWrap('Rendimiento por formato', 'Resultados por tipo', `
     <div class="cards-row">
-      ${metricCard({ icon: '🎬', value: cp.reels?.count ?? 0, label: 'Reels publicados' })}
-      ${metricCard({ value: cp.reels?.avgViews ?? 0, label: 'Promedio de vistas por reel' })}
-      ${metricCard({ value: cp.reels?.avgLikes ?? 0, label: 'Promedio de me gusta por reel' })}
-      ${metricCard({ value: cp.reels?.avgSaves ?? 0, label: 'Promedio de guardados por reel' })}
+      ${metricCard({ icon: 'reel', value: cp.reels?.count ?? 0, label: 'Reels publicados' })}
+      ${metricCard({ icon: 'eye', value: cp.reels?.avgViews ?? 0, label: 'Promedio de vistas por reel' })}
+      ${metricCard({ icon: 'heart', value: cp.reels?.avgLikes ?? 0, label: 'Promedio de me gusta por reel' })}
+      ${metricCard({ icon: 'bookmark', value: cp.reels?.avgSaves ?? 0, label: 'Promedio de guardados por reel' })}
     </div>
     <div class="cards-row" style="margin-top:12px">
-      ${metricCard({ icon: '🖼', value: cp.carrosseis?.count ?? 0, label: 'Carruseles publicados' })}
-      ${metricCard({ value: cp.carrosseis?.avgLikes ?? 0, label: 'Promedio de me gusta por carrusel' })}
-      ${metricCard({ value: cp.carrosseis?.avgSaves ?? 0, label: 'Promedio de guardados por carrusel' })}
-      ${metricCard({ icon: '📷', value: cp.posts?.count ?? 0, label: 'Posts estáticos' })}
+      ${metricCard({ icon: 'carousel', value: cp.carrosseis?.count ?? 0, label: 'Carruseles publicados' })}
+      ${metricCard({ icon: 'heart', value: cp.carrosseis?.avgLikes ?? 0, label: 'Promedio de me gusta por carrusel' })}
+      ${metricCard({ icon: 'bookmark', value: cp.carrosseis?.avgSaves ?? 0, label: 'Promedio de guardados por carrusel' })}
+      ${metricCard({ icon: 'image', value: cp.posts?.count ?? 0, label: 'Posts estáticos' })}
     </div>`);
 
   // 5. Stories
   const s5 = sectionWrap('Historias', 'Rendimiento de historias', `
     <div class="cards-row">
-      ${metricCard({ icon: '🔥', value: storiesPerformance?.alcanceMedio ?? 0, label: 'Alcance promedio' })}
-      ${metricCard({ value: storiesPerformance?.retencaoPct ?? 0, label: 'Retención', suffix: '%', isFloat: false, cssClass: 'accent' })}
-      ${metricCard({ value: storiesPerformance?.respostas ?? 0, label: 'Respuestas' })}
-      ${metricCard({ icon: '📱', value: conteudo?.stories ?? 0, label: 'Historias publicadas' })}
+      ${metricCard({ icon: 'flame', value: storiesPerformance?.alcanceMedio ?? 0, label: 'Alcance promedio' })}
+      ${metricCard({ icon: 'chart', value: storiesPerformance?.retencaoPct ?? 0, label: 'Retención', suffix: '%', isFloat: false, cssClass: 'accent' })}
+      ${metricCard({ icon: 'message', value: storiesPerformance?.respostas ?? 0, label: 'Respuestas' })}
+      ${metricCard({ icon: 'smartphone', value: conteudo?.stories ?? 0, label: 'Historias publicadas' })}
     </div>`);
 
   // 6. Posting Heatmap
@@ -757,7 +830,7 @@ export function renderDashboard(data, deltas = null) {
     </div>
   </div>`;
 
-  dashboard.innerHTML = s1 + s2 + chartsSection + s4 + s5 + s6 + s7 + s8 + s9 + aiSection + evolutionSection;
+  dashboard.innerHTML = hero + s1 + s2 + chartsSection + s4 + s5 + s6 + s7 + s8 + s9 + aiSection + evolutionSection;
 
   // Init charts and counters after DOM is ready
   requestAnimationFrame(() => {
@@ -784,6 +857,11 @@ export function initEvolutionCharts(snapshots) {
   const section = document.getElementById('evolutionSection');
   if (section) section.style.display = '';
 
+  ['evoFollowers', 'evoReach', 'evoEngagement', 'evoInteractions'].forEach(key => {
+    try { _chartInstances[key]?.destroy(); } catch (_) {}
+    delete _chartInstances[key];
+  });
+
   const sorted = [...snapshots].sort((a, b) => a.date.localeCompare(b.date));
   const labels = sorted.map(s => {
     const [y, m, d] = s.date.split('-');
@@ -805,6 +883,7 @@ export function initEvolutionCharts(snapshots) {
   const lineOpts = (yLabel) => ({
     responsive: true,
     maintainAspectRatio: false,
+    animation: { duration: 950, easing: 'easeOutQuart' },
     plugins: {
       legend: { labels: { color: tickColor, boxWidth: 10, padding: 14 } },
       tooltip: tooltipDefaults,
