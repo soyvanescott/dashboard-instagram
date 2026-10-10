@@ -133,7 +133,7 @@ export function renderHeader(data, days = 30, periodo = null, accounts = [], act
 
   const kpis = [
     { label: 'Seguidores', value: formatNumber(crescimento?.seguidoresTotal ?? 0) },
-    { label: 'Interacción', value: (engajamento?.taxaEngajamento ?? 0) + '%' },
+    { label: 'Eng. del perfil', value: (engajamento?.taxaEngajamento ?? 0) + '%' },
     { label: 'Alcance', value: formatNumber(alcance?.contasAlcancadas ?? 0) },
     { label: 'Impresiones', value: formatNumber(alcance?.impressoes ?? 0) },
   ];
@@ -735,7 +735,7 @@ export function renderDashboard(data, deltas = null) {
       <div class="hero-stats">
         <div><strong>${formatNumber(crescimento?.novosSeguidores ?? 0)}</strong><span>Nuevos seguidores</span></div>
         <div><strong>${formatNumber(alcance?.contasAlcancadas ?? 0)}</strong><span>Alcance</span></div>
-        <div><strong>${engajamento?.taxaEngajamento ?? 0}%</strong><span>Interacción</span></div>
+        <div><strong>${engajamento?.taxaEngajamento ?? 0}%</strong><span>Engagement del perfil</span></div>
       </div>
     </div>
     <div class="hero-visual" aria-label="Tendencia de interacciones del periodo">
@@ -765,14 +765,15 @@ export function renderDashboard(data, deltas = null) {
     </div>`);
 
   // 2. Engajamento
-  const s2 = sectionWrap('Interacciones', 'Interacción', `
+  const s2 = sectionWrap('Lectura del periodo', 'Engagement e interacciones', `
     <div class="cards-row">
       ${metricCard({ icon: 'heart', value: engajamento?.curtidas ?? 0, label: 'Me gusta', trend: d.curtidas })}
       ${metricCard({ icon: 'message', value: engajamento?.comentarios ?? 0, label: 'Comentarios', trend: d.comentarios })}
       ${metricCard({ icon: 'bookmark', value: engajamento?.salvamentos ?? 0, label: 'Guardados', trend: d.salvamentos })}
       ${metricCard({ icon: 'share', value: engajamento?.compartilhamentos ?? 0, label: 'Compartidos', trend: d.compartilhamentos })}
       ${metricCard({ icon: 'zap', value: engajamento?.interacoesTotal ?? 0, label: 'Interacciones totales', trend: d.interacoesTotal })}
-      ${metricCard({ icon: 'chart', value: engajamento?.taxaEngajamento ?? 0, label: 'Tasa de interacción', suffix: '%', isFloat: true, cssClass: 'accent', trend: d.taxaEngajamento })}
+      ${metricCard({ icon: 'chart', value: engajamento?.taxaEngajamento ?? 0, label: 'Engagement del perfil', suffix: '%', isFloat: true, cssClass: 'accent', trend: d.taxaEngajamento })}
+      ${metricCard({ icon: 'trending-up', value: engajamento?.engagementMedioPost ?? 0, label: 'Engagement promedio por post', suffix: '%', isFloat: true, cssClass: 'accent', trend: d.engagementMedioPost })}
     </div>`);
 
   // 3. Charts

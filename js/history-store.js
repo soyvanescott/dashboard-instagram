@@ -32,6 +32,7 @@ function extractKPIs(data) {
     compartilhamentos: data.engajamento?.compartilhamentos ?? 0,
     interacoesTotal: data.engajamento?.interacoesTotal ?? 0,
     taxaEngajamento: data.engajamento?.taxaEngajamento ?? 0,
+    engagementMedioPost: data.engajamento?.engagementMedioPost ?? 0,
     toquesLinkBio: data.acoesPerfil?.toquesLinkBio ?? 0,
     reels: data.conteudo?.reels ?? 0,
     carrosseis: data.conteudo?.carrosseis ?? 0,

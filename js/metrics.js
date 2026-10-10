@@ -201,16 +201,27 @@ export async function fetchAllMetrics(days = 30, customSince = null, customUntil
     const saves = getMediaInsightValue(ins, 'saved');
     const shares = getMediaInsightValue(ins, 'shares');
     const views = getMediaInsightValue(ins, 'views');
+    const mediaReach = getMediaInsightValue(ins, 'reach');
+    const totalInteractions = (m.like_count ?? 0) + (m.comments_count ?? 0) + saves + shares;
     return {
       ...m,
       saves,
       shares,
       views,
+      reach: mediaReach,
       media_url: m.media_url ?? null,
       thumbnail_url: m.thumbnail_url ?? null,
-      totalInteractions: (m.like_count ?? 0) + (m.comments_count ?? 0) + saves + shares,
+      totalInteractions,
+      engagementRate: mediaReach > 0 ? Math.round((totalInteractions / mediaReach) * 1000) / 10 : null,
     };
   });
+
+  // Promedio de la tasa individual de cada publicación con alcance disponible.
+  // Las publicaciones sin dato de alcance no se incluyen para no distorsionar el resultado.
+  const postEngagementRates = enrichedMedia
+    .map(m => m.engagementRate)
+    .filter(rate => rate !== null && Number.isFinite(rate));
+  const engagementMedioPost = average(postEngagementRates);
 
   const topPosts = [...enrichedMedia]
     .sort((a, b) => b.totalInteractions - a.totalInteractions)
@@ -292,7 +303,7 @@ export async function fetchAllMetrics(days = 30, customSince = null, customUntil
     },
     crescimento: { seguidoresTotal, novosSeguidores, unfollows },
     alcance: { contasAlcancadas, impressoes },
-    engajamento: { curtidas, comentarios, salvamentos, compartilhamentos, interacoesTotal, taxaEngajamento },
+    engajamento: { curtidas, comentarios, salvamentos, compartilhamentos, interacoesTotal, taxaEngajamento, engagementMedioPost },
     acoesPerfil: { toquesLinkBio },
     conteudo: { reels: reels.length, carrosseis: carousels.length, postsEstaticos: images.length, stories: storiesCount },
     reelsPerformance: { mediaViews, mediaCurtidas, mediaSaves, mediaShares },

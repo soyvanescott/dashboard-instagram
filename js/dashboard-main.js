@@ -158,6 +158,7 @@ async function loadDashboard(forceRefresh = false, days = currentDays) {
         && cached.conteudo && typeof cached.conteudo === 'object'
         && cached.contentPerformance && typeof cached.contentPerformance === 'object'
         && cached.engajamento && typeof cached.engajamento === 'object'
+        && Number.isFinite(Number(cached.engajamento.engagementMedioPost))
         && cached.alcance && typeof cached.alcance === 'object';
       data = hasCompleteChartData ? cached : null;
     }
@@ -190,6 +191,7 @@ async function loadDashboard(forceRefresh = false, days = currentDays) {
           compartilhamentos: data.engajamento?.compartilhamentos ?? 0,
           interacoesTotal: data.engajamento?.interacoesTotal ?? 0,
           taxaEngajamento: data.engajamento?.taxaEngajamento ?? 0,
+          engagementMedioPost: data.engajamento?.engagementMedioPost ?? 0,
         };
         deltas = computeDeltas(currentKpis, prev.kpis);
         if (deltas) deltas._prevDate = prev.date;
