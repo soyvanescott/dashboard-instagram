@@ -219,6 +219,46 @@ function destroyPrimaryCharts() {
   });
 }
 
+function safeNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function chartFallback(canvas, message) {
+  if (!canvas) return;
+  canvas.style.display = 'none';
+  const container = canvas.parentElement;
+  if (!container) return;
+
+  let emptyState = container.querySelector('.chart-empty-state');
+  if (!emptyState) {
+    emptyState = document.createElement('div');
+    emptyState.className = 'chart-empty-state';
+    container.appendChild(emptyState);
+  }
+  emptyState.innerHTML = `${iconSvg('chart')}<span>${escapeHtml(message)}</span>`;
+}
+
+function createChartSafe(key, canvas, config, errorMessage) {
+  if (!canvas) return null;
+
+  try {
+    const registered = typeof Chart.getChart === 'function' ? Chart.getChart(canvas) : null;
+    if (registered && registered !== _chartInstances[key]) registered.destroy();
+    try { _chartInstances[key]?.destroy(); } catch (_) {}
+
+    canvas.style.display = '';
+    canvas.parentElement?.querySelector('.chart-empty-state')?.remove();
+    const instance = new Chart(canvas, config);
+    _chartInstances[key] = instance;
+    return instance;
+  } catch (error) {
+    console.error(`No se pudo crear el gráfico ${key}:`, error);
+    chartFallback(canvas, errorMessage || 'No fue posible mostrar este gráfico. Actualiza el dashboard e inténtalo de nuevo.');
+    return null;
+  }
+}
+
 function initCharts(weeklyData, conteudo) {
   if (typeof Chart === 'undefined') return;
 
@@ -248,28 +288,28 @@ function initCharts(weeklyData, conteudo) {
   // Chart 1: Engajamento semanal
   const ctx1 = document.getElementById('chartWeekly');
   if (ctx1 && weeklyData?.length) {
-    _chartInstances.weekly = new Chart(ctx1, {
+    createChartSafe('weekly', ctx1, {
       type: 'bar',
       data: {
         labels: weeklyData.map(w => w.label),
         datasets: [
           {
             label: 'Me gusta',
-            data: weeklyData.map(w => w.curtidas),
+            data: weeklyData.map(w => safeNumber(w.curtidas)),
             backgroundColor: '#472E25',
             borderRadius: 6,
             borderSkipped: false,
           },
           {
             label: 'Guardados',
-            data: weeklyData.map(w => w.saves),
+            data: weeklyData.map(w => safeNumber(w.saves)),
             backgroundColor: '#FFB5B7',
             borderRadius: 6,
             borderSkipped: false,
           },
           {
             label: 'Compartidos',
-            data: weeklyData.map(w => w.shares),
+            data: weeklyData.map(w => safeNumber(w.shares)),
             backgroundColor: '#B8445A',
             borderRadius: 6,
             borderSkipped: false,
@@ -296,15 +336,25 @@ function initCharts(weeklyData, conteudo) {
           y: { grid: { color: gridColor }, ticks: { color: tickColor } },
         },
       },
-    });
+    }, 'No hay datos semanales disponibles todavía. Pulsa Actualizar para volver a consultarlos.');
+  } else if (ctx1) {
+    chartFallback(ctx1, 'No hay datos semanales disponibles todavía. Pulsa Actualizar para volver a consultarlos.');
   }
 
   // Chart 2: Distribuição de conteúdo
   const ctx2 = document.getElementById('chartContent');
   if (ctx2) {
-    const { reels = 0, carrosseis = 0, postsEstaticos = 0, stories = 0 } = conteudo ?? {};
+    const raw = conteudo ?? {};
+    const reels = safeNumber(raw.reels);
+    const carrosseis = safeNumber(raw.carrosseis);
+    const postsEstaticos = safeNumber(raw.postsEstaticos);
+    const stories = safeNumber(raw.stories);
     const total = reels + carrosseis + postsEstaticos + stories;
-    _chartInstances.content = new Chart(ctx2, {
+    if (total <= 0) {
+      chartFallback(ctx2, 'Meta todavía no devolvió publicaciones para este periodo. Prueba con 30 días y pulsa Actualizar.');
+      return;
+    }
+    createChartSafe('content', ctx2, {
       type: 'doughnut',
       data: {
         labels: ['Reels', 'Carruseles', 'Posts', 'Historias'],
@@ -334,7 +384,7 @@ function initCharts(weeklyData, conteudo) {
           },
         },
       },
-    });
+    }, 'No fue posible mostrar la distribución de contenido. Pulsa Actualizar para intentarlo otra vez.');
   }
 }
 
@@ -844,25 +894,42 @@ export function renderDashboard(data, deltas = null) {
 // ============================================================
 
 export function initEvolutionCharts(snapshots) {
-  if (typeof Chart === 'undefined' || !snapshots || snapshots.length < 2) {
-    const hint = document.getElementById('evolutionHint');
-    if (hint && snapshots && snapshots.length < 2) {
-      const section = document.getElementById('evolutionSection');
-      if (section) section.style.display = '';
-      hint.textContent = 'Los gráficos de evolución aparecen cuando el dashboard tiene datos de al menos 2 días distintos. Vuelve a abrirlo mañana.';
-    }
-    return;
-  }
-
   const section = document.getElementById('evolutionSection');
   if (section) section.style.display = '';
 
-  ['evoFollowers', 'evoReach', 'evoEngagement', 'evoInteractions'].forEach(key => {
+  const chartKeys = ['evoFollowers', 'evoReach', 'evoEngagement', 'evoInteractions'];
+  const chartIds = ['chartEvoFollowers', 'chartEvoReach', 'chartEvoEngagement', 'chartEvoInteractions'];
+
+  if (typeof Chart === 'undefined' || !snapshots?.length) {
+    chartIds.forEach(id => chartFallback(document.getElementById(id), 'Este gráfico se completará con tus próximas actualizaciones diarias.'));
+    const hint = document.getElementById('evolutionHint');
+    if (hint) hint.textContent = 'Todavía no hay registros históricos. Pulsa Actualizar para guardar el primero.';
+    return;
+  }
+
+  chartKeys.forEach(key => {
     try { _chartInstances[key]?.destroy(); } catch (_) {}
     delete _chartInstances[key];
   });
 
-  const sorted = [...snapshots].sort((a, b) => a.date.localeCompare(b.date));
+  // A snapshot is saved for every period (7, 14 and 30 days). Keep only one
+  // entry per calendar day so the timeline never repeats the same date.
+  const byDate = new Map();
+  [...snapshots].sort((a, b) => String(a.date).localeCompare(String(b.date))).forEach(snapshot => {
+    if (!snapshot?.date) return;
+    const existing = byDate.get(snapshot.date);
+    const snapshotTime = snapshot.updatedAt || snapshot.createdAt || '';
+    const existingTime = existing?.updatedAt || existing?.createdAt || '';
+    if (!existing || snapshot.days === 30 || (existing.days !== 30 && snapshotTime >= existingTime)) {
+      byDate.set(snapshot.date, snapshot);
+    }
+  });
+
+  const sorted = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+  if (!sorted.length) {
+    chartIds.forEach(id => chartFallback(document.getElementById(id), 'Este gráfico se completará con tus próximas actualizaciones diarias.'));
+    return;
+  }
   const labels = sorted.map(s => {
     const [y, m, d] = s.date.split('-');
     return d + '/' + m;
@@ -893,46 +960,46 @@ export function initEvolutionCharts(snapshots) {
       x: { grid: { color: gridColor }, ticks: { color: tickColor } },
       y: { grid: { color: gridColor }, ticks: { color: tickColor }, title: { display: false } },
     },
-    elements: { point: { radius: 4, hoverRadius: 6 }, line: { tension: 0.3 } },
+    elements: { point: { radius: sorted.length === 1 ? 5 : 4, hoverRadius: 6 }, line: { tension: 0.3 } },
   });
 
   // 1. Followers
   const ctx1 = document.getElementById('chartEvoFollowers');
   if (ctx1) {
-    _chartInstances.evoFollowers = new Chart(ctx1, {
+    createChartSafe('evoFollowers', ctx1, {
       type: 'line',
       data: {
         labels,
         datasets: [{
           label: 'Seguidores',
-          data: sorted.map(s => s.kpis.seguidores),
+          data: sorted.map(s => safeNumber(s.kpis?.seguidores)),
           borderColor: '#472E25',
           backgroundColor: 'rgba(255, 181, 183, 0.22)',
           fill: true,
         }],
       },
       options: lineOpts(),
-    });
+    }, 'El crecimiento de seguidores se mostrará con tus próximas actualizaciones.');
   }
 
   // 2. Reach & Impressions
   const ctx2 = document.getElementById('chartEvoReach');
   if (ctx2) {
-    _chartInstances.evoReach = new Chart(ctx2, {
+    createChartSafe('evoReach', ctx2, {
       type: 'line',
       data: {
         labels,
         datasets: [
           {
             label: 'Alcance',
-            data: sorted.map(s => s.kpis.alcance),
+            data: sorted.map(s => safeNumber(s.kpis?.alcance)),
             borderColor: '#472E25',
             backgroundColor: 'rgba(71, 46, 37, 0.08)',
             fill: false,
           },
           {
             label: 'Impresiones',
-            data: sorted.map(s => s.kpis.impressoes),
+            data: sorted.map(s => safeNumber(s.kpis?.impressoes)),
             borderColor: '#FFB5B7',
             backgroundColor: 'rgba(255, 181, 183, 0.14)',
             fill: false,
@@ -940,62 +1007,64 @@ export function initEvolutionCharts(snapshots) {
         ],
       },
       options: lineOpts(),
-    });
+    }, 'La evolución del alcance se mostrará con tus próximas actualizaciones.');
   }
 
   // 3. Engagement rate
   const ctx3 = document.getElementById('chartEvoEngagement');
   if (ctx3) {
-    _chartInstances.evoEngagement = new Chart(ctx3, {
+    createChartSafe('evoEngagement', ctx3, {
       type: 'line',
       data: {
         labels,
         datasets: [{
           label: 'Tasa de interacción (%)',
-          data: sorted.map(s => s.kpis.taxaEngajamento),
+          data: sorted.map(s => safeNumber(s.kpis?.taxaEngajamento)),
           borderColor: '#B8445A',
           backgroundColor: 'rgba(184, 68, 90, 0.12)',
           fill: true,
         }],
       },
       options: lineOpts(),
-    });
+    }, 'La tasa de interacción se mostrará con tus próximas actualizaciones.');
   }
 
   // 4. Interactions breakdown
   const ctx4 = document.getElementById('chartEvoInteractions');
   if (ctx4) {
-    _chartInstances.evoInteractions = new Chart(ctx4, {
+    createChartSafe('evoInteractions', ctx4, {
       type: 'line',
       data: {
         labels,
         datasets: [
           {
             label: 'Me gusta',
-            data: sorted.map(s => s.kpis.curtidas),
+            data: sorted.map(s => safeNumber(s.kpis?.curtidas)),
             borderColor: '#472E25',
             fill: false,
           },
           {
             label: 'Guardados',
-            data: sorted.map(s => s.kpis.salvamentos),
+            data: sorted.map(s => safeNumber(s.kpis?.salvamentos)),
             borderColor: '#FFB5B7',
             fill: false,
           },
           {
             label: 'Compartidos',
-            data: sorted.map(s => s.kpis.compartilhamentos),
+            data: sorted.map(s => safeNumber(s.kpis?.compartilhamentos)),
             borderColor: '#B8445A',
             fill: false,
           },
         ],
       },
       options: lineOpts(),
-    });
+    }, 'La evolución de las interacciones se mostrará con tus próximas actualizaciones.');
   }
 
   const hint = document.getElementById('evolutionHint');
   if (hint) {
-    hint.textContent = sorted.length + ' coleta' + (sorted.length > 1 ? 's' : '') + ' registrada' + (sorted.length > 1 ? 's' : '') + ' — de ' + labels[0] + ' a ' + labels[labels.length - 1];
+    hint.textContent = sorted.length === 1
+      ? 'Este es tu primer registro. La evolución se completará con las próximas actualizaciones diarias.'
+      : sorted.length + ' días registrados — del ' + labels[0] + ' al ' + labels[labels.length - 1];
   }
 }

@@ -4,6 +4,9 @@ import { initSupabase } from './supabase-client.js';
 
 const isAddMode = new URLSearchParams(location.search).get('add') === '1';
 
+const brandIcon = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V7M17 16v-3"/></svg>`;
+const lockIcon = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>`;
+
 loadServerConfig().then(async () => {
   await initSupabase();
   await syncFromCloud();
@@ -89,9 +92,10 @@ function render() {
       bodyHTML = `
         <div class="input-group">
           <label class="input-label">Tu token</label>
-          <input type="text" class="input-field" id="tokenInput" placeholder="Pega tu token aquí (empieza con IGAA...)">
+          <input type="password" class="input-field" id="tokenInput" autocomplete="off" spellcheck="false" placeholder="Pega tu token aquí (empieza con IGAA...)">
           <span class="input-hint">El token empieza con "IGAA" y tiene unos 200 caracteres</span>
         </div>
+        <div class="wizard-secure-note">${lockIcon}<span>Tu token se utiliza para consultar tus métricas y nunca se muestra dentro del dashboard.</span></div>
         <div class="status" id="wizardStatus"></div>`;
     } else {
       bodyHTML = `<div class="wizard-instructions">${step.instructions}</div>`;
@@ -116,8 +120,10 @@ function render() {
   wizard.innerHTML = `
     ${fileWarning}
     <div class="wizard-header">
+      <div class="wizard-brand">${brandIcon}</div>
+      <div class="wizard-eyebrow">Estrategia basada en datos</div>
       <h1 class="wizard-title">Tu dashboard de Instagram</h1>
-      <p class="wizard-subtitle">${isAddMode ? 'Agregar otra cuenta' : 'Conéctalo en 4 pasos'}</p>
+      <p class="wizard-subtitle">${isAddMode ? 'Agrega otra cuenta a tu panel central.' : 'Conecta tu cuenta en cuatro pasos y transforma tus métricas en decisiones de contenido.'}</p>
     </div>
     <div class="wizard-progress">
       ${progressItems}

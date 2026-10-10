@@ -152,7 +152,14 @@ async function loadDashboard(forceRefresh = false, days = currentDays) {
   let data;
   try {
     if (!forceRefresh && !isCustom && days === 30) {
-      data = getCache();
+      const cached = getCache();
+      const hasCompleteChartData = cached
+        && Array.isArray(cached.weeklyData)
+        && cached.conteudo && typeof cached.conteudo === 'object'
+        && cached.contentPerformance && typeof cached.contentPerformance === 'object'
+        && cached.engajamento && typeof cached.engajamento === 'object'
+        && cached.alcance && typeof cached.alcance === 'object';
+      data = hasCompleteChartData ? cached : null;
     }
 
     if (!data) {
