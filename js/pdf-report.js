@@ -82,21 +82,21 @@ export function generateReportHTML(data, deltas, canvasImages) {
     { value: fmt(storiesPerformance.alcanceMedio), label: 'Alcance promedio' },
     { value: (storiesPerformance.retencaoPct || 0) + '%', label: 'Retención' },
     { value: fmt(storiesPerformance.respostas), label: 'Respuestas' },
-    { value: String(conteudo.stories || 0), label: 'Stories Publicados' },
+    { value: String(conteudo.stories || 0), label: 'Historias publicadas' },
   ]));
 
   var topPostsHtml = '';
   if (topPosts.length) {
-    topPostsHtml = section('Top posts', '<div class="top-posts">' + topPosts.slice(0, 6).map(function(p) {
+    topPostsHtml = section('Mejores publicaciones', '<div class="top-posts">' + topPosts.slice(0, 6).map(function(p) {
       var type = p.media_product_type === 'REELS' ? 'Reel' : p.media_type === 'CAROUSEL_ALBUM' ? 'Carrusel' : 'Post';
       return '<div class="top-post"><span class="post-type">' + type + '</span>'
-        + '<span class="post-stats">' + fmt(p.like_count || 0) + ' curtidas &middot; ' + fmt(p.saves || 0) + ' saves &middot; ' + fmt(p.shares || 0) + ' shares</span></div>';
+        + '<span class="post-stats">' + fmt(p.like_count || 0) + ' me gusta &middot; ' + fmt(p.saves || 0) + ' guardados &middot; ' + fmt(p.shares || 0) + ' compartidos</span></div>';
     }).join('') + '</div>');
   }
 
   var aud = audiencia;
   var s7 = section('Audiencia', '<div class="audience-row">'
-    + '<div class="aud-block"><h3>Género</h3><p><strong style="color:#c0457b">' + (aud.pctMulheres || 0) + '%</strong> Mujeres &nbsp; <strong style="color:#2471a3">' + (aud.pctHomens || 0) + '%</strong> Homens</p></div>'
+    + '<div class="aud-block"><h3>Género</h3><p><strong style="color:#c0457b">' + (aud.pctMulheres || 0) + '%</strong> Mujeres &nbsp; <strong style="color:#2471a3">' + (aud.pctHomens || 0) + '%</strong> Hombres</p></div>'
     + '<div class="aud-block"><h3>Rango de edad</h3><p class="age-big">' + esc(aud.faixaEtaria || '—') + '</p></div>'
     + '<div class="aud-block"><h3>Ciudades principales</h3>' + ((aud.cidades || []).length ? '<ol>' + aud.cidades.map(function(c) { return '<li>' + esc(c.nome) + ' <strong>' + c.pct + '%</strong></li>'; }).join('') + '</ol>' : '<p>Sin datos</p>') + '</div>'
     + '</div>');
@@ -108,7 +108,7 @@ export function generateReportHTML(data, deltas, canvasImages) {
     if (best) {
       heatmapHtml = section('Mejor horario', '<p class="best-time">&#x2B50; <strong>' + days[best.day] + ' a las ' + best.hour + 'h</strong> — ' + best.avgEng + ' interacción promedio (' + best.count + ' posts)</p>'
         + '<p style="color:#666;font-size:11px;margin-top:8px">Top 5 horarios:</p><ol>'
-        + postingHeatmap.slice().sort(function(a, b) { return b.avgEng - a.avgEng; }).slice(0, 5).map(function(h) { return '<li>' + days[h.day] + ' ' + h.hour + 'h — ' + h.avgEng + ' eng (' + h.count + ' posts)</li>'; }).join('')
+        + postingHeatmap.slice().sort(function(a, b) { return b.avgEng - a.avgEng; }).slice(0, 5).map(function(h) { return '<li>' + days[h.day] + ' ' + h.hour + 'h — ' + h.avgEng + ' interacciones (' + h.count + ' publicaciones)</li>'; }).join('')
         + '</ol>');
     }
   }
@@ -132,6 +132,6 @@ export function openPdfReport(data, deltas) {
   var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   var url = URL.createObjectURL(blob);
   var win = window.open(url, '_blank');
-  if (!win) { alert('Popup bloqueado. Permita popups para gerar o PDF.'); return; }
+  if (!win) { alert('La ventana emergente está bloqueada. Permite las ventanas emergentes para generar el PDF.'); return; }
   win.onload = function() { setTimeout(function() { win.print(); URL.revokeObjectURL(url); }, 400); };
 }

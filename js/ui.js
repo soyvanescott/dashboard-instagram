@@ -193,22 +193,22 @@ function initCharts(weeklyData, conteudo) {
     Chart.register(ChartDataLabels);
   }
 
-  Chart.defaults.color = 'rgba(255, 247, 236, 0.58)';
-  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.color = '#7D5D51';
+  Chart.defaults.font.family = "'DM Sans', sans-serif";
   Chart.defaults.font.size = 11;
 
   const tooltipDefaults = {
-    backgroundColor: 'rgba(13, 8, 7, 0.92)',
-    titleColor: '#FFF7EC',
-    bodyColor: 'rgba(255, 247, 236, 0.72)',
-    borderColor: 'rgba(196, 144, 142, 0.3)',
+    backgroundColor: 'rgba(42, 27, 21, 0.96)',
+    titleColor: '#FFF8F7',
+    bodyColor: '#F6E3DF',
+    borderColor: 'rgba(255, 181, 183, 0.45)',
     borderWidth: 1,
     padding: 10,
     cornerRadius: 10,
   };
 
-  const gridColor = 'rgba(255, 247, 236, 0.05)';
-  const tickColor = 'rgba(255, 247, 236, 0.45)';
+  const gridColor = 'rgba(71, 46, 37, 0.08)';
+  const tickColor = '#7D5D51';
 
   // Chart 1: Engajamento semanal
   const ctx1 = document.getElementById('chartWeekly');
@@ -221,21 +221,21 @@ function initCharts(weeklyData, conteudo) {
           {
             label: 'Me gusta',
             data: weeklyData.map(w => w.curtidas),
-            backgroundColor: 'rgba(196, 144, 142, 0.85)',
+            backgroundColor: '#472E25',
             borderRadius: 6,
             borderSkipped: false,
           },
           {
             label: 'Guardados',
             data: weeklyData.map(w => w.saves),
-            backgroundColor: 'rgba(245, 203, 215, 0.75)',
+            backgroundColor: '#FFB5B7',
             borderRadius: 6,
             borderSkipped: false,
           },
           {
             label: 'Compartidos',
             data: weeklyData.map(w => w.shares),
-            backgroundColor: 'rgba(116, 30, 49, 0.85)',
+            backgroundColor: '#B8445A',
             borderRadius: 6,
             borderSkipped: false,
           },
@@ -250,7 +250,7 @@ function initCharts(weeklyData, conteudo) {
           datalabels: {
             anchor: 'end',
             align: 'top',
-            color: 'rgba(255, 247, 236, 0.75)',
+            color: '#472E25',
             font: { size: 10, weight: '600' },
             formatter: v => v > 0 ? (v >= 1000 ? (v / 1000).toFixed(1) + 'K' : v) : '',
           },
@@ -274,8 +274,8 @@ function initCharts(weeklyData, conteudo) {
         labels: ['Reels', 'Carruseles', 'Posts', 'Historias'],
         datasets: [{
           data: [reels, carrosseis, postsEstaticos, stories],
-          backgroundColor: ['#741E31', '#C4908E', '#F5CBD7', '#8b5e6a'],
-          borderColor: 'rgba(13, 8, 7, 0.5)',
+          backgroundColor: ['#472E25', '#FFB5B7', '#B8445A', '#C9A79D'],
+          borderColor: '#FFFFFF',
           borderWidth: 2,
           hoverOffset: 8,
         }],
@@ -288,7 +288,7 @@ function initCharts(weeklyData, conteudo) {
           legend: { position: 'bottom', labels: { color: tickColor, boxWidth: 12, padding: 14 } },
           tooltip: tooltipDefaults,
           datalabels: {
-            color: 'rgba(255, 247, 236, 0.9)',
+            color: '#FFFFFF',
             font: { size: 11, weight: '700' },
             formatter: (v) => {
               const pct = total > 0 ? Math.round(v / total * 100) : 0;
@@ -488,7 +488,7 @@ function renderAnalysis(data) {
 
   // --- Parar ---
   if (worstReach && bestReach && bestReach.avgViews > 0 && worstReach.avgViews < bestReach.avgViews * 0.35 && worstReach.name !== bestReach.name) {
-    parar.push(`<strong>${worstReach.name}</strong> tienen un alcance promedio de ${formatNumber(worstReach.avgViews)} contra ${formatNumber(bestReach.avgViews)} de los ${bestReach.name}. Publica menos de ese formato y redirige el esforço para o formato que mais performa.`);
+    parar.push(`<strong>${worstReach.name}</strong> tienen un alcance promedio de ${formatNumber(worstReach.avgViews)} frente a ${formatNumber(bestReach.avgViews)} de los ${bestReach.name}. Publica menos de ese formato y dirige el esfuerzo hacia el formato que mejor funciona.`);
   }
   if (novosSegs <= 0 && (crescimento?.seguidoresTotal ?? 0) > 0) {
     parar.push(`Crecimiento de seguidores <strong>estancado</strong> en el período. Revisa tu estrategia para atraer seguidores y prueba ganchos más fuertes en los primeros 3 segundos de los reels.`);
@@ -595,7 +595,7 @@ function renderHeatmap(postingHeatmap) {
 
   const bestLabel = bestSlot ? dayLabels[bestSlot.day] + ' a las ' + bestSlot.hour + 'h (' + bestSlot.avgEng + ' interacción promedio)' : '';
 
-  return sectionWrap('Cuándo publicar', 'Mejor horario', '<div class="heatmap-wrap"><div class="heatmap-header"><div class="heatmap-day-label"></div>' + headerCells + '</div>' + rows + '</div>' + (bestLabel ? '<p class="heatmap-best">⭐ Mejor horario: <strong>' + bestLabel + '</strong></p>' : '') + '<p class="heatmap-legend"><span class="heatmap-legend-low"></span> Baixo <span class="heatmap-legend-high"></span> Alto engajamento</p>');
+  return sectionWrap('Cuándo publicar', 'Mejor horario', '<div class="heatmap-wrap"><div class="heatmap-header"><div class="heatmap-day-label"></div>' + headerCells + '</div>' + rows + '</div>' + (bestLabel ? '<p class="heatmap-best">⭐ Mejor horario: <strong>' + bestLabel + '</strong></p>' : '') + '<p class="heatmap-legend"><span class="heatmap-legend-low"></span> Interacción baja <span class="heatmap-legend-high"></span> Interacción alta</p>');
 }
 
 // ============================================================
@@ -790,13 +790,13 @@ export function initEvolutionCharts(snapshots) {
     return d + '/' + m;
   });
 
-  const gridColor = 'rgba(255, 247, 236, 0.05)';
-  const tickColor = 'rgba(255, 247, 236, 0.45)';
+  const gridColor = 'rgba(71, 46, 37, 0.08)';
+  const tickColor = '#7D5D51';
   const tooltipDefaults = {
-    backgroundColor: 'rgba(13, 8, 7, 0.92)',
-    titleColor: '#FFF7EC',
-    bodyColor: 'rgba(255, 247, 236, 0.72)',
-    borderColor: 'rgba(196, 144, 142, 0.3)',
+    backgroundColor: 'rgba(42, 27, 21, 0.96)',
+    titleColor: '#FFF8F7',
+    bodyColor: '#F6E3DF',
+    borderColor: 'rgba(255, 181, 183, 0.45)',
     borderWidth: 1,
     padding: 10,
     cornerRadius: 10,
@@ -827,8 +827,8 @@ export function initEvolutionCharts(snapshots) {
         datasets: [{
           label: 'Seguidores',
           data: sorted.map(s => s.kpis.seguidores),
-          borderColor: '#C4908E',
-          backgroundColor: 'rgba(196, 144, 142, 0.15)',
+          borderColor: '#472E25',
+          backgroundColor: 'rgba(255, 181, 183, 0.22)',
           fill: true,
         }],
       },
@@ -847,15 +847,15 @@ export function initEvolutionCharts(snapshots) {
           {
             label: 'Alcance',
             data: sorted.map(s => s.kpis.alcance),
-            borderColor: '#C4908E',
-            backgroundColor: 'rgba(196, 144, 142, 0.1)',
+            borderColor: '#472E25',
+            backgroundColor: 'rgba(71, 46, 37, 0.08)',
             fill: false,
           },
           {
             label: 'Impresiones',
             data: sorted.map(s => s.kpis.impressoes),
-            borderColor: '#F5CBD7',
-            backgroundColor: 'rgba(245, 203, 215, 0.1)',
+            borderColor: '#FFB5B7',
+            backgroundColor: 'rgba(255, 181, 183, 0.14)',
             fill: false,
           },
         ],
@@ -874,8 +874,8 @@ export function initEvolutionCharts(snapshots) {
         datasets: [{
           label: 'Tasa de interacción (%)',
           data: sorted.map(s => s.kpis.taxaEngajamento),
-          borderColor: '#741E31',
-          backgroundColor: 'rgba(116, 30, 49, 0.15)',
+          borderColor: '#B8445A',
+          backgroundColor: 'rgba(184, 68, 90, 0.12)',
           fill: true,
         }],
       },
@@ -894,19 +894,19 @@ export function initEvolutionCharts(snapshots) {
           {
             label: 'Me gusta',
             data: sorted.map(s => s.kpis.curtidas),
-            borderColor: 'rgba(196, 144, 142, 0.85)',
+            borderColor: '#472E25',
             fill: false,
           },
           {
             label: 'Guardados',
             data: sorted.map(s => s.kpis.salvamentos),
-            borderColor: 'rgba(245, 203, 215, 0.85)',
+            borderColor: '#FFB5B7',
             fill: false,
           },
           {
             label: 'Compartidos',
             data: sorted.map(s => s.kpis.compartilhamentos),
-            borderColor: 'rgba(116, 30, 49, 0.85)',
+            borderColor: '#B8445A',
             fill: false,
           },
         ],
