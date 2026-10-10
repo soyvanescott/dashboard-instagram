@@ -714,6 +714,29 @@ body {
   height: 230px;
 }
 
+.chart-empty-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+  text-align: center;
+  background: linear-gradient(145deg, #FFF8F7, #FFF4F3);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.chart-empty-state svg {
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
+}
+
 /* ============================================================
    EVOLUTION CHARTS
    ============================================================ */
@@ -1076,9 +1099,43 @@ body {
    WIZARD (index.html)
    ============================================================ */
 
-.wizard-container { max-width: 560px; margin: 48px auto; padding: 0 16px; }
+.wizard-container {
+  width: min(100% - 32px, 680px);
+  margin: 64px auto;
+  padding: 42px;
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(241, 214, 211, 0.95);
+  border-radius: 30px;
+  box-shadow: 0 28px 80px rgba(71, 46, 37, 0.13);
+  backdrop-filter: blur(18px);
+}
 
 .wizard-header { text-align: center; margin-bottom: 32px; }
+
+.wizard-brand {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  color: var(--pink);
+  background: var(--espresso);
+  box-shadow: 0 12px 28px rgba(42, 27, 21, 0.18);
+}
+
+.wizard-brand svg { width: 25px; height: 25px; }
+
+.wizard-eyebrow {
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
 
 .wizard-title {
   font-family: var(--font-display);
@@ -1088,7 +1145,7 @@ body {
   margin-bottom: 8px;
 }
 
-.wizard-subtitle { font-size: 13px; color: var(--text-secondary); }
+.wizard-subtitle { max-width: 420px; margin: 0 auto; font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
 
 .wizard-progress { display: flex; align-items: center; margin-bottom: 24px; }
 
@@ -1101,8 +1158,8 @@ body {
   transition: background 0.2s ease, color 0.2s ease;
 }
 
-.wizard-step-indicator.active { background: var(--pink); color: var(--berry); }
-.wizard-step-indicator.completed { background: var(--positive); color: #0D0807; }
+.wizard-step-indicator.active { background: var(--espresso); color: var(--pink); box-shadow: 0 0 0 5px var(--blush); }
+.wizard-step-indicator.completed { background: var(--accent); color: #FFFFFF; }
 .wizard-step-indicator.pending { background: var(--blush); color: var(--text-secondary); }
 
 .wizard-step-line { flex: 1; height: 2px; background: var(--border); }
@@ -1114,7 +1171,8 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 28px;
-  box-shadow: var(--shadow);
+  box-shadow: none;
+  animation: fadeSlideUp .38s ease both;
 }
 
 .wizard-step-title { font-family: var(--font-display); font-size: 25px; font-weight: 400; color: var(--text-primary); margin-bottom: 6px; }
@@ -1141,7 +1199,7 @@ body {
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-ui);
   font-size: 13px;
   color: var(--text-primary);
   background: #FFFFFF;
@@ -1149,8 +1207,23 @@ body {
   transition: border-color 0.15s ease;
 }
 
-.input-field:focus { border-color: var(--accent); }
+.input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
 .input-hint { font-size: 10px; color: var(--text-muted); }
+
+.wizard-secure-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: var(--text-secondary);
+  background: var(--blush);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.wizard-secure-note svg { width: 16px; height: 16px; flex: 0 0 auto; color: var(--accent); }
 
 /* ============================================================
    RESPONSIVE
@@ -1165,6 +1238,7 @@ body {
 }
 
 @media (max-width: 768px) {
+  .wizard-container { width: min(100% - 24px, 680px); margin: 24px auto; padding: 28px 20px; border-radius: 24px; }
   .insight-hero { min-height: auto; padding: 34px 24px; border-radius: 22px; gap: 28px; }
   .insight-hero h1 { font-size: 39px; }
   .hero-stats { gap: 18px; justify-content: space-between; }
