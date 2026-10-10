@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ig-dashboard-v3';
+const CACHE_NAME = 'ig-dashboard-v5-vane-es';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
