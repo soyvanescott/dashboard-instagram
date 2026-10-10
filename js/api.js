@@ -6,9 +6,7 @@ async function graphGet(path, params = {}) {
   const token = getToken();
   if (!token) throw new Error('No hay un token configurado');
 
-  const qs = new URLSearchParams({ access_token: token, ...params });
-  qs.set('apiPath', `/${API_VERSION}${path}`);
-  const res = await fetch(`/api/proxy?${qs}`);
+  const res = await fetch('/api/proxy', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apiPath:`/${API_VERSION}${path}`,params,token})});
   const data = await res.json();
 
   if (data.error) {
@@ -18,12 +16,7 @@ async function graphGet(path, params = {}) {
 }
 
 export async function validateToken(token) {
-  const qs = new URLSearchParams({
-    fields: 'user_id,username,name,account_type,profile_picture_url,followers_count',
-    access_token: token,
-    apiPath: `/${API_VERSION}/me`,
-  });
-  const res = await fetch(`/api/proxy?${qs}`);
+  const res = await fetch('/api/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apiPath:`/${API_VERSION}/me`,params:{fields:'user_id,username,name,account_type,profile_picture_url,followers_count'},token})});
   const data = await res.json();
 
   if (data.error) {
