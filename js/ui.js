@@ -715,7 +715,7 @@ export function renderDashboard(data, deltas = null) {
 
   if (d._prevDate) {
     const [y, m, day] = d._prevDate.split('-');
-    periodoLabel += ` — vs. coleta de ${day}/${m}`;
+    periodoLabel += ` — comparado con el registro del ${day}/${m}`;
   }
 
   const weeklyValues = (weeklyData ?? []).map(w => (w.curtidas ?? 0) + (w.saves ?? 0) + (w.shares ?? 0));
@@ -729,7 +729,7 @@ export function renderDashboard(data, deltas = null) {
 
   const hero = `<section class="insight-hero">
     <div class="insight-hero-copy">
-      <div class="hero-eyebrow">Instagram Intelligence · ${escapeHtml(periodoLabel)}</div>
+      <div class="hero-eyebrow">Inteligencia de Instagram · ${escapeHtml(periodoLabel)}</div>
       <h1>Tus datos, convertidos en <em>decisiones.</em></h1>
       <p>En este periodo alcanzaste <strong>${formatNumber(alcance?.contasAlcancadas ?? 0)} cuentas</strong> y generaste <strong>${formatNumber(engajamento?.interacoesTotal ?? 0)} interacciones</strong>. Aquí tienes la lectura completa para decidir qué repetir, ajustar y dejar atrás.</p>
       <div class="hero-stats">
